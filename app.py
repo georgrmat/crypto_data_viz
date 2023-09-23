@@ -9,9 +9,9 @@ df = pd.read_csv("df.csv")
 df.rename(columns = {"open_time": "date"}, inplace = True)
 df["date"] = pd.to_datetime(df["date"], unit = "ms")
 df.set_index("date", inplace=True)
-st.dataframe(df)
 
-"""
+
+
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
@@ -20,7 +20,7 @@ date_range = st.date_input("Select Date Range", min_value=df.index.min(), max_va
 
 # Filter the data based on the selected date range
 filtered_df = df[(df.index >= date_range[0]) & (df.index <= date_range[1])]
-
+st.dataframe(filtered_df)
 # Create a candlestick chart using Plotly
 candlestick_chart = go.Figure(data=[go.Candlestick(x=filtered_df.index,
                                                    open=filtered_df['open'],
@@ -34,5 +34,5 @@ candlestick_chart.update_layout(title="OHLCV Candlestick Chart",
                                 yaxis_title="Price")
 
 # Display the candlestick chart using Streamlit
-"""
-st.plotly_chart(df)
+
+st.plotly_chart(candlestick_chart)
