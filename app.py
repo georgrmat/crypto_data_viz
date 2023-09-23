@@ -1,6 +1,7 @@
 import streamlit as st
 import mplfinance as mpf
 import pandas as pd
+import plotly.graph_objects as go
 
 # Load the CSV data
 df = pd.read_csv("df.csv")
@@ -10,15 +11,27 @@ df["date"] = pd.to_datetime(df["date"], unit = "ms")
 df.set_index("date", inplace=True)
 st.dataframe(df)
 
+
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
-# Define the style of the chart
-style = mpf.make_mpf_style(base_mpf_style='binance', gridstyle='--')
+# Add a date range slider to customize the data displayed
+date_range = st.date_input("Select Date Range", min_value=df.index.min(), max_value=df.index.max())
 
-# Display the candlestick chart using Streamlit's st.pyplot
-fig, axlist = mpf.plot(df[0:10], type='candle', style=style, title="OHLCV Candlestick Chart", returnfig=True)
+# Filter the data based on the selected date range
+filtered_df = df[(df.index >= date_range[0]) & (df.index <= date_range[1])]
 
-# Show the chart in Streamlit
-st.pyplot(fig)
+# Create a candlestick chart using Plotly
+candlestick_chart = go.Figure(data=[go.Candlestick(x=filtered_df.index,
+                                                   open=filtered_df['open'],
+                                                   high=filtered_df['high'],
+                                                   low=filtered_df['low'],
+                                                   close=filtered_df['close'])])
 
+# Customize the chart layout
+candlestick_chart.update_layout(title="OHLCV Candlestick Chart",
+                                xaxis_title="Date",
+                                yaxis_title="Price")
+
+# Display the candlestick chart using Streamlit
+st.plotly_chart(candlestick_chart)
