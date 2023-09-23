@@ -5,7 +5,7 @@ import pandas as pd
 # Load the CSV data
 df = pd.read_csv("df.csv")
 st.dataframe(df)
-
+df.rename(columns = {"open_time": "date"}, inplace = True)
 df["date"] = pd.to_datetime(df["date"])
 df.set_index("date", inplace=True)
 
