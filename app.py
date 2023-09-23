@@ -11,7 +11,7 @@ df["date"] = pd.to_datetime(df["date"], unit = "ms")
 df.set_index("date", inplace=True)
 st.dataframe(df)
 
-
+"""
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
@@ -34,4 +34,5 @@ candlestick_chart.update_layout(title="OHLCV Candlestick Chart",
                                 yaxis_title="Price")
 
 # Display the candlestick chart using Streamlit
-st.plotly_chart(candlestick_chart)
+"""
+st.plotly_chart(df)
