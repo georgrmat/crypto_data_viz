@@ -8,6 +8,7 @@ df = pd.read_csv("df.csv")
 df.rename(columns={"open_time": "date"}, inplace=True)
 df["date"] = pd.to_datetime(df["date"], unit="ms")
 df.set_index("date", inplace=True)
+st.dataframe(df)
 
 # Define the Streamlit app
 st.title("Candlestick Chart App")
