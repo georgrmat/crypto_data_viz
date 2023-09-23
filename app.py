@@ -13,7 +13,7 @@ df.set_index("date", inplace=True)
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
-st.dataframe(filtered_df)
+st.dataframe(df)
 # Create a candlestick chart using Plotly
 candlestick_chart = go.Figure(data=[go.Candlestick(x=df.index,
                                                    open=df['open'],
