@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 # Load the CSV data
 df = pd.read_csv("df.csv")
@@ -10,8 +9,10 @@ df.rename(columns={"open_time": "date"}, inplace=True)
 df["date"] = pd.to_datetime(df["date"], unit="ms")
 df.set_index("date", inplace=True)
 
-# Initialize the candlestick chart
-fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
+# Define the Streamlit app
+st.title("Trading Chart with Positions")
+
+# Create a candlestick chart using Plotly
 candlestick_trace = go.Candlestick(
     x=df.index,
     open=df['open'],
@@ -20,65 +21,57 @@ candlestick_trace = go.Candlestick(
     close=df['close'],
     name="Candlesticks"
 )
-fig.add_trace(candlestick_trace, row=1, col=1)
 
-# Initialize drawing shapes
-shapes = []
+# Create a scatter trace for positions (stop loss and take profit)
+positions_trace = go.Scatter(
+    x=[df.index[10], df.index[20]],  # Adjust the x-coordinates for your positions
+    y=[150, 160],  # Adjust the y-coordinates for your positions
+    mode="markers+text",
+    marker=dict(
+        size=10,
+        color=["red", "green"],  # Red for stop loss, green for take profit
+    ),
+    text=["Stop Loss", "Take Profit"],  # Labels for positions
+    textposition="top right",
+)
 
-# Define the Streamlit app
-st.title("Trading Chart with Drawing")
+# Customize the chart layout
+layout = go.Layout(
+    title="OHLCV Candlestick Chart with Positions",
+    xaxis_title="Date",
+    yaxis_title="Price",
+    showlegend=True,
+    shapes=[],
+)
 
-# Add buttons for drawing
-draw_line = st.button("Draw Trend Line")
-draw_rectangle = st.button("Draw Rectangle")
+# Add positions to the layout as rectangles
+layout.shapes.extend([
+    go.layout.Shape(
+        type="rect",
+        xref="x",
+        yref="y",
+        x0=df.index[10],  # Adjust x0 and x1 for the stop loss position
+        y0=150,           # Adjust y0 and y1 for the stop loss position
+        x1=df.index[12],  # Adjust x0 and x1 for the take profit position
+        y1=160,           # Adjust y0 and y1 for the take profit position
+        fillcolor="rgba(255, 0, 0, 0.2)",  # Red for stop loss
+        line=dict(width=0),
+    ),
+    go.layout.Shape(
+        type="rect",
+        xref="x",
+        yref="y",
+        x0=df.index[20],  # Adjust x0 and x1 for the stop loss position
+        y0=150,           # Adjust y0 and y1 for the stop loss position
+        x1=df.index[22],  # Adjust x0 and x1 for the take profit position
+        y1=160,           # Adjust y0 and y1 for the take profit position
+        fillcolor="rgba(0, 255, 0, 0.2)",  # Green for take profit
+        line=dict(width=0),
+    ),
+])
 
-# Define a callback for drawing lines
-if draw_line:
-    st.write("Click on the chart to draw a trend line.")
+# Create the figure
+fig = go.Figure(data=[candlestick_trace, positions_trace], layout=layout)
 
-    # Handle user interaction for drawing a line
-    clicked_points = st.plotly_chart(fig, use_container_width=True, config={"scrollZoom": False})
-
-    # Store the clicked points in a list
-    if st.button("Finish Drawing"):
-        shapes.append(
-            go.layout.Shape(
-                type="line",
-                x0=clicked_points.clickData["points"][0]["x"],
-                y0=clicked_points.clickData["points"][0]["y"],
-                x1=clicked_points.clickData["points"][1]["x"],
-                y1=clicked_points.clickData["points"][1]["y"],
-                line=dict(color="red", width=2)
-            )
-        )
-
-# Define a callback for drawing rectangles
-if draw_rectangle:
-    st.write("Click and drag on the chart to draw a rectangle.")
-
-    # Handle user interaction for drawing a rectangle
-    drawn_shape = st.plotly_chart(fig, use_container_width=True, config={"scrollZoom": False, "editable": True})
-
-    # Store the drawn rectangle in a list
-    if st.button("Finish Drawing"):
-        shapes.append(
-            go.layout.Shape(
-                type="rect",
-                x0=drawn_shape.to_dict()["props"]["figure"]["layout"]["dragmode"][0]["dragmode"]["x0"],
-                y0=drawn_shape.to_dict()["props"]["figure"]["layout"]["dragmode"][0]["dragmode"]["y0"],
-                x1=drawn_shape.to_dict()["props"]["figure"]["layout"]["dragmode"][0]["dragmode"]["x1"],
-                y1=drawn_shape.to_dict()["props"]["figure"]["layout"]["dragmode"][0]["dragmode"]["y1"],
-                fillcolor="rgba(0, 0, 255, 0.2)"
-            )
-        )
-
-# Update the chart with the drawn shapes
-fig.update_layout(shapes=shapes)
-
-# Display the updated chart
+# Display the candlestick chart with positions using Streamlit
 st.plotly_chart(fig, use_container_width=True, config={"scrollZoom": False})
-
-
-
-
-
