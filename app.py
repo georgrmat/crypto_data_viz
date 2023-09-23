@@ -1,14 +1,20 @@
 import streamlit as st
-import plotly.express as px
+import mplfinance as mpf
 import pandas as pd
 
-# Create a Streamlit app
-st.title("Trading Chart App")
+# Load the CSV data
+df = pd.read_csv("df.csv")
+df["date"] = pd.to_datetime(df["date"])
+df.set_index("date", inplace=True)
 
-# Load and display your trading data (you can replace this with your data)
-data = pd.read_csv(r"df.csv")
-st.line_chart(data)
+# Define the Streamlit app
+st.title("Candlestick Chart App")
 
-# Add drawing capabilities (for user annotations)
-st.subheader("Draw on the Chart")
-drawn_chart = st.plotly_chart(px.scatter())
+# Define the style of the chart
+style = mpf.make_mpf_style(base_mpf_style='binance', gridstyle='--')
+
+# Display the candlestick chart using Streamlit's st.pyplot
+fig, axlist = mpf.plot(df[0:10], type='candle', style=style, title="OHLCV Candlestick Chart", returnfig=True)
+
+# Show the chart in Streamlit
+st.pyplot(fig)
