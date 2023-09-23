@@ -6,7 +6,7 @@ import pandas as pd
 df = pd.read_csv("df.csv")
 df["date"] = pd.to_datetime(df["date"])
 df.set_index("date", inplace=True)
-
+st.dataframe(df)
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
