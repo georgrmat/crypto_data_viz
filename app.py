@@ -6,10 +6,10 @@ import pandas as pd
 df = pd.read_csv("df.csv")
 
 df.rename(columns = {"open_time": "date"}, inplace = True)
-df["date"] = pd.to_datetime(df["date"])
+df["date"] = pd.to_datetime(df["date"], unit = "ms")
 df.set_index("date", inplace=True)
 st.dataframe(df)
-"""
+
 # Define the Streamlit app
 st.title("Candlestick Chart App")
 
@@ -21,4 +21,4 @@ fig, axlist = mpf.plot(df[0:10], type='candle', style=style, title="OHLCV Candle
 
 # Show the chart in Streamlit
 st.pyplot(fig)
-"""
+
